@@ -7,7 +7,7 @@ It leverages the power of DBus for the interprocess communication.
 ## Table of Contents
 
 - [Requirements](#requirements)
-- [Dependencies](#system-level-dependencies)
+- [Dependencies](#dependencies)
 - [Install](#install)
 
 ## Requirements
@@ -25,14 +25,18 @@ python --version
 
 Don't forget to review the system-level dependencies section for non-Python dependencies instructions.
 
-## System-Level Dependencies
+## Dependencies
 
-It might require some system level dependencies:
+The script requires some system level dependencies:
 
 - `python3-gi`
 - `python3-gi-cairo`
 - `gir1.2-gtk-3.0`
 
+## The following Python libraries are needed as well:
+
+- `pydbus`
+- 
 ## Install
 
 On Ubuntu, you can install them by running:
