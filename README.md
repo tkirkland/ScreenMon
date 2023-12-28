@@ -62,3 +62,6 @@ That said, it bugged my significantly that, given the combinability of KDE on Li
 per screen in X11 using Nvidia proprietary drivers.  Combine that would the horrible performance of Nouveau and you
 see my dilemma.  I searched for weeks and could find nothing so the idea to make this script was born.  Originally
 created as a shell script, I decided to try making a Python variant.  Here we are.
+
+## THANKS
+Giving credit where credit is due; Special thanks to user Naftuli Kay in [this thread.](https://askubuntu.com/questions/631997/subscribe-for-dbus-event-of-screen-power-off)
