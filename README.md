@@ -32,5 +32,5 @@ It might require some system level dependencies:
 On Ubuntu, you can install them by running:
 
 ```shell
-sudo apt-get install libglib2.0-dev sudo apt-get install libdbus-1-dev
+sudo apt-get install libglib2.0-dev install libdbus-1-dev
 ```
