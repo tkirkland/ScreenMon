@@ -33,7 +33,7 @@ The script requires some system level dependencies:
 - `python3-gi-cairo`
 - `gir1.2-gtk-3.0`
 
-## The following Python libraries are needed as well:
+The following Python libraries are needed as well:
 
 - `pydbus`
 - 
