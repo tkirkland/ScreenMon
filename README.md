@@ -12,6 +12,8 @@ If you don't use Linux and X11, this script will be of no use to you.  Its purpo
 - [Requirements](#requirements)
 - [Dependencies](#dependencies)
 - [Install](#install)
+- [ToDo](#todo)
+- [History](#history)
 
 ## Requirements
 
