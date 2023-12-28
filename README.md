@@ -46,7 +46,7 @@ The following Python libraries are needed as well:
 
 ## Install
 
-On Ubuntu (or derivative), you can install them by running:
+On Ubuntu (or derivative), you can install the system dependencies by running:
 
 ```shell
 sudo apt-get install python3-gi python3-gi-cairo gir1.2-gtk-3.0
