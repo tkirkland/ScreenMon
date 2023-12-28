@@ -54,7 +54,8 @@ sudo apt-get install python3-gi python3-gi-cairo gir1.2-gtk-3.0
 ## TODO
 
 Add ability via command switch to scan active display settings and store them in a config file
-to be used in the script to resolve hardcoded display names and resolutions.
+to be used in the script to resolve hardcoded display information that is currently passed to the 
+'xrandr' calls.
 
 ## HISTORY
 
