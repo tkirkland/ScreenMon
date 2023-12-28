@@ -8,7 +8,7 @@ It leverages the power of DBus for the interprocess communication.
 
 - [Requirements](#requirements)
 - [Dependencies](#system-level-dependencies)
-- [Install[]](#install)
+- [Install](#install)
 
 ## Requirements
 
