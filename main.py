@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pydbus import SessionBus
-from gi.repository import GLib
-import threading
+import argparse
 import subprocess
 import sys
+import threading
 import time
-import argparse
+
+from gi.repository import GLib
+from pydbus import SessionBus
 
 
 def screen_lock_handler(locked):
@@ -18,7 +19,11 @@ def screen_lock_handler(locked):
 
 
 def execute_command(command):
-    subprocess.run(command, shell=True)
+    cmd_result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if cmd_result.returncode != 0:
+        print("Execution of: \"%s\" returned non-zero result: %s", command, cmd_result.returncode)
+        sys.exit(1)
+    return cmd_result.stdout.splitlines()
 
 
 def listen_for_lock_signals():
@@ -55,9 +60,6 @@ def get_current_display_setup():
     """
     print("Getting current display setup...")
     xrandr_output = subprocess.check_output(["xrandr"]).decode("utf-8")
-
-    # Run xrandr command and capture the output
-    # xrandr_output = subprocess.check_output(["xrandr"]).decode("utf-8")
 
     # Parse the xrandr output
     # parsed_elements = parse_xrandr_output(xrandr_output)
@@ -107,4 +109,8 @@ def main():
 
 
 if __name__ == "__main__":
+    # generate test code for execute_command
+    text = execute_command("xrandr")
+    print(text)
+    exit(0)
     main()
