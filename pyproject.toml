@@ -1,14 +1,13 @@
 [tool.poetry]
-name = "displaymon"
-version = "0.1.0"
-description = ""
+name = "screenmon"
+version = "0.3.0"
+description = "A simple Python script to monitor screen lock state"
 authors = ["Tony <tony@tonykirkland.net>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pydbus = "^0.6.0"
-
 
 
 [build-system]
