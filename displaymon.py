@@ -9,6 +9,7 @@ import time
 
 from gi.repository import GLib
 from pydbus import SessionBus
+from screeninfo import get_monitors
 
 
 def screen_lock_handler(locked):
@@ -21,7 +22,7 @@ def screen_lock_handler(locked):
 def execute_command(command):
     cmd_result = subprocess.run(command, shell=True, capture_output=True, text=True)
     if cmd_result.returncode != 0:
-        print("Execution of: \"%s\" returned non-zero result: %s", command, cmd_result.returncode)
+        print(f"Execution of: {command} failed with return code {cmd_result.returncode}")
         sys.exit(1)
     return cmd_result.stdout.splitlines()
 
@@ -58,14 +59,10 @@ def get_current_display_setup():
     - Build a simple text I/O to verify parsed elements before generating
     - A display configuration
     """
-    print("Getting current display setup...")
-    xrandr_output = subprocess.check_output(["xrandr"]).decode("utf-8")
-
-    # Parse the xrandr output
-    # parsed_elements = parse_xrandr_output(xrandr_output)
-
-    # Verify the parsed elements using a simple text I/O
-    # verify_parsed_elements(parsed_elements)
+    active_display = get_monitors()
+    print(f"Detected displays::")
+    for monitor in active_display:
+        print(f": {monitor.width}x{monitor.height} at position ({monitor.x}, {monitor.y})")
 
 
 def turn_off_secondary_display():
@@ -109,8 +106,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # generate test code for execute_command
-    text = execute_command("xrandr")
-    print(text)
-    exit(0)
     main()
