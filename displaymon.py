@@ -16,7 +16,6 @@ from screeninfo import get_monitors
 def which(program):
     def is_executable(file_path):
         return os.path.isfile(file_path) and os.access(file_path, os.X_OK)
-
     _fp, _fn = os.path.split(program)
     if _fp:
         if is_executable(program):
