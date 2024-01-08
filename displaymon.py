@@ -3,6 +3,7 @@
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -10,12 +11,12 @@ import time
 
 from gi.repository import GLib
 from pydbus import SessionBus
-from screeninfo import get_monitors
 
 
 def which(program):
     def is_executable(file_path):
         return os.path.isfile(file_path) and os.access(file_path, os.X_OK)
+
     _fp, _fn = os.path.split(program)
     if _fp:
         if is_executable(program):
@@ -36,12 +37,22 @@ def screen_lock_handler(locked):
     # You can add actions to be performed when the screen is unlocked
 
 
-def execute_command(command):
-    cmd_result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    if cmd_result.returncode != 0:
-        print(f"Execution of: {command} failed with return code {cmd_result.returncode}")
+def execute_command(command, return_output=False):
+    try:
+        process = subprocess.Popen(command, stdout=subprocess.PIPE)
+        stdout, _ = process.communicate()
+
+        if process.returncode != 0:
+            print(f"Execution of: {command} failed with return code {process.returncode}")
+            sys.exit(1)
+
+        stdout_decoded = stdout.decode('utf-8').split('\n')
+
+        if return_output:
+            return stdout_decoded
+    except Exception as e:
+        print(f"An error occurred when executing the command: {command}. Error: {str(e)}")
         sys.exit(1)
-    return cmd_result.stdout.splitlines()
 
 
 def listen_for_lock_signals():
@@ -51,6 +62,7 @@ def listen_for_lock_signals():
     This function sets up a listener for lock signals by connecting to the ActiveChanged signal of the
     ScreenSaver D-Bus service. It then starts the listener function in a separate thread.
     """
+
     def listen():
         bus = SessionBus()
         screensaver = bus.get(".ScreenSaver")  # Adjust this as per your D-Bus service
@@ -64,14 +76,48 @@ def listen_for_lock_signals():
 
 
 def get_current_display_setup():
-    monitors = []
-    for display in get_monitors():
-        name = display.name
-        is_prim = display.is_primary  # Assuming that 'is_primary' is a property of a display
-        x = display.width  # Assuming that 'width' is a property of a display
-        y = display.height  # Assuming that 'height' is a property of a display
-        monitors.append(Monitor(name, is_prim, x, y))
-    return monitors
+    lines = execute_command(['xandr'], True)
+    result = []
+    positions_order = []
+    for line in lines:
+        if "connected" in line and "disconnected" not in line:
+            data = {}
+            details = line.split()
+            data['id'] = details[0]
+
+            is_connected_primary = ('primary' in line)
+            data['is_primary'] = is_connected_primary
+
+            mode_info = re.search(r'\d+x\d+\+\d+\+\d+', line)
+            refresh_rate = re.search(r'\d+\.\d+\*', line)
+            refresh_rate_no_asterisk = re.search(r'[^*]\d+\.\d+', line)
+            if mode_info:
+                mode_info = mode_info.group(0).split("+")
+                data['resolution'] = mode_info[0]
+                data['position'] = (mode_info[1], mode_info[2])
+                positions_order.append((data['id'], int(mode_info[1])))
+
+                if refresh_rate:
+                    data['current_refresh_rate'] = round(float(refresh_rate.group(0).replace('*', '')))
+                elif refresh_rate_no_asterisk:
+                    data['current_refresh_rate'] = round(float(refresh_rate_no_asterisk.group(0)))
+
+            result.append(data)
+
+    ordered_positions = sorted(positions_order, key=lambda x: x[1])
+    display_positions = [i[0] for i in ordered_positions]
+
+    for data in result:
+        if data.get('position'):
+            position_index = display_positions.index(data['id'])
+            if position_index == 0:
+                data['relative_position'] = 'left'
+            elif position_index == len(display_positions) - 1:
+                data['relative_position'] = 'right'
+            else:
+                data['relative_position'] = 'middle'
+    # TODO - Parse the detected displays into Monitor class
+    return result
 
 
 class Monitor:
@@ -92,18 +138,15 @@ class Monitor:
 
 def turn_off_secondary_display():
     # subprocess.run(["xrandr", "--output", "DP-2", "--off"])
-    execute_command("xrandr --output DP-2 --off)")
+    execute_command("xrandr --output DP-2 --off)", False)
 
 
 def configure_displays():
     execute_command(
         "xrandr --output DP-4 --mode 3840x2160 --rate 120 --scale 1x1 \
         --output DP-2 --mode 2560x1440 --rate 165 --scale 1.5x1.5 \
-        --right-of DP-4 --pos 3840x360 --primary"
+        --right-of DP-4 --pos 3840x360 --primary", False
     )
-    # subprocess.run(["xrandr", "--output", "DP-4", "--mode", "3840x2160", "--rate", "120", "--scale", "1x1",
-    #                 "--output", "DP-2", "--mode", "2560x1440", "--rate", "165", "--scale", "1.5x1.5",
-    #                 "--right-of", "DP-4", "--pos", "3840x360", "--primary"])
     # we run again to force wallpaper resize  TODO: less kludge way yo achieve?
     subprocess.run(
         ["xrandr", "--output", "DP-4", "--mode", "3840x2160", "--rate", "120", "--scale", "1x1", "--primary"])
