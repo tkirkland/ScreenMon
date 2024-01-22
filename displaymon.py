@@ -147,7 +147,7 @@ def configure_displays():
         --output DP-2 --mode 2560x1440 --rate 165 --scale 1.5x1.5 \
         --right-of DP-4 --pos 3840x360 --primary", False
     )
-    # we run again to force wallpaper resize  TODO: less kludge way yo achieve?
+    # we run again to force wallpaper resize  TODO: less kludge way to achieve?
     subprocess.run(
         ["xrandr", "--output", "DP-4", "--mode", "3840x2160", "--rate", "120", "--scale", "1x1", "--primary"])
 
